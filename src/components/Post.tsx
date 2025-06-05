@@ -76,6 +76,7 @@ export default function Post({ text, media, likes, dislikes, commentCount, creat
                 className="w-full h-auto object-cover" 
                 style={{ maxHeight: '500px' }} 
               /> : <video
+              style={{ maxHeight: '500px' }} 
               className="w-full h-auto object-cover" 
               src={CDN_LINK + media?.[0]?.url} controls /> }
             </div>
