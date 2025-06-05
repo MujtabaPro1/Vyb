@@ -95,7 +95,7 @@ export default function Login() {
           </div>
         </div>
         
-        <div className="flex items-center justify-between text-sm">
+        <div className="flex items-center justify-between text-sm hidden">
           <label className="flex items-center space-x-2">
             <input type="checkbox" className="rounded border-gray-300" />
             <span>Remember me</span>
@@ -114,7 +114,7 @@ export default function Login() {
           Sign In
         </Button>
         
-        <div className="text-center mt-6">
+        <div className="text-center mt-6 hidden">
           <p className="text-sm text-muted-foreground">
             Don't have an account?{' '}
             <a href="#" className="text-primary hover:underline">
