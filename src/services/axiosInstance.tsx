@@ -2,9 +2,10 @@ import axios from 'axios';
 
 
 export const BASEURL_V1 = 'https://test.api.yourargo.com:3000';
-export const BASEURL_STG = 'https://test.api.justvyb.com';
-export const BASEURL = 'https://api.justvyb.com'
-export const CDN_LINK = 'https://cdn.justvyb.com/'
+export const BASEURL = 'https://test.api.justvyb.com';
+export const BASEURL_PROD = 'https://api.justvyb.com'
+export const CDN_LINK_PROD = 'https://cdn.justvyb.com/'
+export const CDN_LINK = 'https://assetargo.com/';
 
 
 
