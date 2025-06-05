@@ -79,7 +79,7 @@ export default function Profile() {
             />
           </div>
           
-          <div className="mt-16 flex justify-between items-start">
+          <div className="mt-16 flex flex-col lg:flex-row justify-between items-start">
             <div>
               <h1 className="text-2xl font-bold">{profileUser?.userName}</h1>
               <p className="text-muted-foreground">@{profileUser?.userName}</p>
@@ -115,7 +115,7 @@ export default function Profile() {
               </div>
             </div>
             
-            <div className="flex gap-2">
+            <div className="flex gap-2 mt-4 lg:mt-0">
               <Button variant="outline" size="sm">
                 <Settings size={16} className="mr-1" />
                 Settings
