@@ -82,6 +82,7 @@ export default function Profile() {
     getRepostPosts();
   }, [user]);
 
+  
   const getView = () => {
     switch (activeTab) {
       case 'posts':
