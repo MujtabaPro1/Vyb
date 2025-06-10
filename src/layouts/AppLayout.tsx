@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import { Home, Search, User, LogOut, Sun, Moon } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
-import { CDN_LINK } from '../services/axiosInstance';
+import { CDN_LINK, CDN_LINK_PROD, isProd } from '../services/axiosInstance';
 
 export default function AppLayout() {
   const { user, isAuthenticated, logout } = useAuth();
@@ -21,6 +21,11 @@ export default function AppLayout() {
   }, [isAuthenticated, navigate]);
 
   if (!mounted) return null;
+
+
+    const getProfilePicture = () => {
+      return  isProd ? CDN_LINK_PROD  + user?.profilePicture : CDN_LINK + user?.profilePicture; 
+    }
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
@@ -44,10 +49,10 @@ export default function AppLayout() {
             
             {user && (
               <div className="flex items-center gap-2">
-                <span className="text-sm font-medium hidden sm:inline">{user.userName}</span>
+                <span className="text-sm font-medium hidden sm:inline">{user.username}</span>
                 <img 
-                  src={CDN_LINK + user.profilePicture} 
-                  alt={user.userName}
+                  src={getProfilePicture()} 
+                  alt={user.username}
                   className="w-8 h-8 rounded-full object-cover" 
                 />
               </div>

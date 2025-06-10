@@ -6,15 +6,20 @@ import Button from '../../components/ui/Button';
 import Post from '../../components/Post';
 import { MOCK_POSTS } from '../../lib/utils';
 import { useAuth } from '../../context/AuthContext';
-import axiosInstance from '../../services/axiosInstance';
+import axiosInstance, { CDN_LINK_PROD, isProd } from '../../services/axiosInstance';
 import { useEffect } from 'react';
 import { CDN_LINK } from '../../services/axiosInstance';
+
+
 
 export default function Profile() {
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState<'posts' | 'shared' | 'repost' | 'links'>('posts');
   const [profileUser, setProfileUser] = useState<any>({});
   const [userPosts, setUserPosts] = useState<any>([]);
+  const [sharedPosts, setSharedPosts] = useState<any>([]);
+  const [repostPosts, setRepostPosts] = useState<any>([]);
+  const [links, setLinks] = useState<any>([]);
   
 
   useEffect(() => {
@@ -34,6 +39,28 @@ export default function Profile() {
     }
   }
 
+  const getSharedPosts = async () => {
+    try {
+      const res = await axiosInstance.get('posts/user/tagged/' + user._id);
+      setSharedPosts(res?.data);
+    } catch (err) {
+      console.log('errr',err);
+      alert(err?.response?.data?.message);
+    }
+  }
+
+  const getRepostPosts = async () => {
+    try {
+      const res = await axiosInstance.get('/posts/list?postType=repost');
+      console.log(res?.data);
+      setRepostPosts(res?.data?.posts);
+    } catch (err) {
+      console.log('errr',err);
+      alert(err?.response?.data?.message);
+    }
+  }
+
+ 
 
   const getProfile = () => {
     axiosInstance.get('/users/profile')
@@ -43,6 +70,7 @@ export default function Profile() {
       _user.followersCount = response.data?.followers;
       _user.followingCount = response.data?.following;
       setProfileUser(_user);
+      setLinks(response?.data?.socialSiteLinks);
     })
     .catch((error: any) => {
       console.error(error);
@@ -50,8 +78,72 @@ export default function Profile() {
   }
 
   useEffect(() => {
-    getProfile();
-  }, []);
+    getSharedPosts();
+    getRepostPosts();
+  }, [user]);
+
+  const getView = () => {
+    switch (activeTab) {
+      case 'posts':
+        return userPosts ? userPosts?.map((post: any) => <Post key={post._id} 
+        id={post._id}
+        userId={post.userId}
+        text={post.text}
+        media={post.media}
+        likes={post.likes}
+        dislikes={post.dislikes}
+        commentCount={post.commentCount}
+        createdAt={post.createdAt}
+        userDetails={post.userDetails}
+        />) : null;
+      case 'shared':
+        return sharedPosts ? sharedPosts?.map((post: any) => <Post key={post._id} 
+        id={post._id}
+        userId={post.userId}
+        text={post.text}
+        media={post.media}
+        likes={post.likes}
+        dislikes={post.dislikes}
+        commentCount={post.commentCount}
+        createdAt={post.createdAt}
+        userDetails={post.userId}
+        />) : null;
+      case 'repost':
+        return repostPosts ? repostPosts?.map((post: any) => <Post key={post._id} 
+        id={post._id}
+        userId={post.userId}
+        text={post.text}
+        media={post.media}
+        likes={post.likes}
+        dislikes={post.dislikes}
+        commentCount={post.commentCount}
+        createdAt={post.createdAt}
+        userDetails={post.userDetails}
+        />) : null;
+      case 'links':
+        return links ? links?.map((link: any) => <a
+        className='flex items-center gap-2 shadow-sm p-2 rounded-lg hover:bg-muted'
+        href={link.url}>
+          <img 
+          className='w-[20px] object-contain h-[20px]'
+          src={link.title == 'website' ? './social/web.png' : link.title == 'snapchat' ? './social/snap.png' : link.title == 'email' ? './social/email.png' : link.title == 'tiktok' ? './social/tiktok.png' : link.title == 'youtube' ? './social/youtube.png' : link.title == 'x' ? './social/x.png' : './social/web.png'} alt={link.title} />
+          <p>{link.title.charAt(0).toUpperCase() + link.title.slice(1)}</p>
+        </a>) : null;
+      default:
+        return <div className="text-center py-12">
+        <Bookmark size={48} className="mx-auto text-muted-foreground mb-4" />
+        <p className="text-muted-foreground">No saved posts yet.</p>
+        <p className="text-sm text-muted-foreground mt-2">
+          Posts you save will appear here.
+        </p>
+      </div>;
+    }
+  }
+
+
+  const getProfilePicture = () => {
+    return  isProd ? CDN_LINK_PROD  + profileUser?.profilePicture : CDN_LINK + profileUser?.profilePicture; 
+  }
 
   return (
     <div className="max-w-4xl mx-auto">
@@ -73,7 +165,7 @@ export default function Profile() {
           {/* Profile picture */}
           <div className="absolute -top-16 left-6 border-4 border-background rounded-full">
             <img 
-              src={CDN_LINK + profileUser?.profilePicture} 
+              src={getProfilePicture()} 
               alt={profileUser?.userName} 
               className="w-32 h-32 rounded-full object-cover" 
             />
@@ -144,7 +236,7 @@ export default function Profile() {
         </button>
         <button
           className={`px-4 py-2 font-medium ${
-            activeTab === 'saved' 
+            activeTab === 'shared' 
               ? 'text-primary border-b-2 border-primary' 
               : 'text-muted-foreground'
           }`}
@@ -183,28 +275,7 @@ export default function Profile() {
         animate={{ opacity: 1 }}
         transition={{ duration: 0.3 }}
       >
-        {activeTab === 'posts' ? (
-          <>
-            {userPosts.length > 0 ? (
-              userPosts.map(post => (
-                <Post key={post.id} {...post} />
-              ))
-            ) : (
-              <div className="text-center py-12">
-                <p className="text-muted-foreground">No posts yet. Create your first post!</p>
-                <Button className="mt-4">Create Post</Button>
-              </div>
-            )}
-          </>
-        ) : (
-          <div className="text-center py-12">
-            <Bookmark size={48} className="mx-auto text-muted-foreground mb-4" />
-            <p className="text-muted-foreground">No saved posts yet.</p>
-            <p className="text-sm text-muted-foreground mt-2">
-              Posts you save will appear here.
-            </p>
-          </div>
-        )}
+        {getView()}
       </motion.div>
     </div>
   );

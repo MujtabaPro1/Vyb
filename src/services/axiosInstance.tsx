@@ -6,6 +6,7 @@ export const BASEURL = 'https://test.api.justvyb.com';
 export const BASEURL_PROD = 'https://api.justvyb.com'
 export const CDN_LINK_PROD = 'https://cdn.justvyb.com/'
 export const CDN_LINK = 'https://assetargo.com/';
+export const isProd = false;
 
 
 
@@ -37,10 +38,8 @@ export function configureAxios(accessToken:any) {
 service.interceptors.request.use(
   config => {
 
-    console.log('storeState',localStorage.getItem('user'));
     if(localStorage.getItem('user')){
       const user = JSON.parse(localStorage.getItem('user') || '{}');
-      console.log(user);
       config.headers.Authorization = `Bearer ${user.access_token}`;
     }
 

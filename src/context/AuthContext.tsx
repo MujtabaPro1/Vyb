@@ -60,7 +60,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setUser(null);
     setIsAuthenticated(false);
     localStorage.removeItem('user');
-    navigate('/login');
+    window.location.href = '/login';
   };
 
   // Mock forgot password function
